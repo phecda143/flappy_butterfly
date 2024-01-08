@@ -57,7 +57,8 @@ class StartMenu:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos
                     if start_button.collidepoint(mouse_pos):
-                        print("Начало игры")
+                        start_game = StartGame(self.width, self.height)
+                        start_game.running()
                     elif settings_button.collidepoint(mouse_pos):
                         settings = Settings(self.width, self.height)
                         settings.show_settings()
@@ -159,6 +160,90 @@ class Settings:
             self.draw_text(str(round(current_volume, 1)), self.BLACK, self.width // 2 + 100, self.height // 2 - 75)
 
             pygame.display.flip()
+
+
+class StartGame:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+        # инициализация окна и заголовка
+        self.screen = pygame.display.set_mode((self.width, self.height))
+        # фон
+        self.background_image = pygame.image.load("backgroundforgamestart.png")
+        self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
+
+        self.WHITE = (255, 255, 255)
+        self.BLACK = (0, 0, 0)
+
+        # шрифт
+        self.font = pygame.font.Font("4x4kanafont.ttf", 30)
+
+        # кнопка для возращения на стартовое окно
+        self.back_to_startmenu = pygame.Rect(0, 0, 150, 50)
+        self.back_to_startmenu_text = "BACK"
+
+        # создание уровня 1
+        self.firstlvl_surf = pygame.image.load("1lvl.png")
+        self.firstlvl_surf = pygame.transform.scale(self.firstlvl_surf, (150, 350))
+        self.firstlvl_rect = self.firstlvl_surf.get_rect(topleft=(150, 150))
+
+        # создание уровня 2
+        self.secondlvl_surf = pygame.image.load("2lvl.png")
+        self.secondlvl_surf = pygame.transform.scale(self.secondlvl_surf, (150, 350))
+        self.secondlvl_rect = self.secondlvl_surf.get_rect(topleft=(340, 150))
+
+        # создание уровня 3
+        self.thirdlvl_surf = pygame.image.load("3lvl.png")
+        self.thirdlvl_surf = pygame.transform.scale(self.thirdlvl_surf, (150, 350))
+        self.thirdlvl_rect = self.thirdlvl_surf.get_rect(topleft=(530, 150))
+
+    def draw_text(self, text, color, x, y):
+        text_obj = self.font.render(text, True, color)
+        text_rect = text_obj.get_rect()
+        text_rect.center = (x, y)
+        self.screen.blit(text_obj, text_rect)
+
+    def running(self):
+        while True:
+            self.screen.blit(self.background_image, (0, 0))
+
+            # инициализация кнопок уровней
+            lvl1_button = pygame.Rect(145, 145, 160, 400)
+            pygame.draw.rect(self.screen, self.WHITE, lvl1_button)
+            self.draw_text("1 LVL", self.BLACK, 230, 525)
+            lvl2_button = pygame.Rect(335, 145, 160, 400)
+            pygame.draw.rect(self.screen, self.WHITE, lvl2_button)
+            self.draw_text("2 LVL", self.BLACK, 420, 525)
+            lvl3_button = pygame.Rect(525, 145, 160, 400)
+            pygame.draw.rect(self.screen, self.WHITE, lvl3_button)
+            self.draw_text("3 LVL", self.BLACK, 610, 525)
+
+            # отображаем уровни
+            self.screen.blit(self.firstlvl_surf, self.firstlvl_rect)
+            self.screen.blit(self.secondlvl_surf, self.secondlvl_rect)
+            self.screen.blit(self.thirdlvl_surf, self.thirdlvl_rect)
+
+            # инициализация кнопки и текста для возвращения
+            pygame.draw.rect(self.screen, (255, 255, 255), self.back_to_startmenu)
+            back_to_startmenu_button_text = self.font.render(self.back_to_startmenu_text, True, (0, 0, 0))
+            self.screen.blit(back_to_startmenu_button_text, (10, 10))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = event.pos
+                    if self.back_to_startmenu.collidepoint(mouse_pos):
+                        return
+                    if lvl1_button.collidepoint(mouse_pos):
+                        print("УРОВЕНЬ 1")
+                    if lvl2_button.collidepoint(mouse_pos):
+                        print("УРОВЕНЬ 2")
+                    if lvl3_button.collidepoint(mouse_pos):
+                        print("УРОВЕНЬ 3")
+            pygame.display.update()
 
 
 menu = StartMenu(800, 600)
