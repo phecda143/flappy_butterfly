@@ -184,17 +184,17 @@ class StartGame:
         self.back_to_startmenu_text = "BACK"
 
         # создание уровня 1
-        self.firstlvl_surf = pygame.image.load("1lvl.png")
+        self.firstlvl_surf = pygame.image.load("1lvl_icon.png")
         self.firstlvl_surf = pygame.transform.scale(self.firstlvl_surf, (150, 350))
         self.firstlvl_rect = self.firstlvl_surf.get_rect(topleft=(150, 150))
 
         # создание уровня 2
-        self.secondlvl_surf = pygame.image.load("2lvl.png")
+        self.secondlvl_surf = pygame.image.load("2lvl_icon.png")
         self.secondlvl_surf = pygame.transform.scale(self.secondlvl_surf, (150, 350))
         self.secondlvl_rect = self.secondlvl_surf.get_rect(topleft=(340, 150))
 
         # создание уровня 3
-        self.thirdlvl_surf = pygame.image.load("3lvl.png")
+        self.thirdlvl_surf = pygame.image.load("3lvl_icon.png")
         self.thirdlvl_surf = pygame.transform.scale(self.thirdlvl_surf, (150, 350))
         self.thirdlvl_rect = self.thirdlvl_surf.get_rect(topleft=(530, 150))
 
