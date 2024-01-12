@@ -2,7 +2,11 @@ import pygame
 import sys
 
 
+flag = True
+
+
 class StartMenu:
+
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -10,7 +14,10 @@ class StartMenu:
         pygame.init()
 
         # окно и заголовок
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        if flag:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+        else:
+            pygame.display.toggle_fullscreen()
         pygame.display.set_caption("Стартовое меню")
 
         # загрузка фона
@@ -75,7 +82,11 @@ class Settings:
         self.height = height
 
         # инициализация окна и заголовка
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        if flag:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+        else:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            pygame.display.toggle_fullscreen()
         # фон
         self.background_image = pygame.image.load("game_background.png ")
         self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
@@ -104,6 +115,7 @@ class Settings:
         self.screen.blit(text_obj, text_rect)
 
     def show_settings(self):
+        global flag
         while True:
             self.screen.blit(self.background_image, (0, 0))
 
@@ -155,7 +167,12 @@ class Settings:
                         pygame.mixer.music.set_volume(max(current_volume - 0.1, 0.0))
 
                     if self.fullscreen_button.collidepoint(mouse_pos):
-                        pygame.display.toggle_fullscreen()
+                        if flag:
+                            pygame.display.toggle_fullscreen()
+                            flag = False
+                        else:
+                            self.screen = pygame.display.set_mode((self.width, self.height))
+                            flag = True
             current_volume = pygame.mixer.music.get_volume()
             self.draw_text(str(round(current_volume, 1)), self.BLACK, self.width // 2 + 100, self.height // 2 - 75)
 
@@ -168,7 +185,11 @@ class StartGame:
         self.height = height
 
         # инициализация окна и заголовка
-        self.screen = pygame.display.set_mode((self.width, self.height))
+        if flag:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+        else:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            pygame.display.toggle_fullscreen()
         # фон
         self.background_image = pygame.image.load("backgroundforgamestart.png")
         self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
