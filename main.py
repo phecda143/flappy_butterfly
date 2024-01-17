@@ -1,7 +1,6 @@
 import pygame
 import sys
 
-
 flag = True
 
 
@@ -88,7 +87,7 @@ class Settings:
             self.screen = pygame.display.set_mode((self.width, self.height))
             pygame.display.toggle_fullscreen()
         # фон
-        self.background_image = pygame.image.load("game_background.png ")
+        self.background_image = pygame.image.load("game_background.png")
         self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
 
         self.WHITE = (255, 255, 255)
@@ -264,6 +263,68 @@ class StartGame:
                         print("УРОВЕНЬ 2")
                     if lvl3_button.collidepoint(mouse_pos):
                         print("УРОВЕНЬ 3")
+            pygame.display.update()
+
+
+class Final_Window:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+        if flag:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+        else:
+            self.screen = pygame.display.set_mode((self.width, self.height))
+            pygame.display.toggle_fullscreen()
+
+        self.background_image = pygame.image.load("game_background.png")
+        self.background_image = pygame.transform.scale(self.background_image, (self.width, self.height))
+
+        self.font = pygame.font.Font("4x4kanafont.ttf", 25)
+
+        self.back_to_menu_button = pygame.Rect(450, 450, 300, 50)
+        self.back_to_menu_text = "BACK TO MENU"
+
+        self.start_again_button = pygame.Rect(50, 450, 300, 50)
+        self.start_again_text = "START AGAIN"
+
+        self.game_over = pygame.image.load("game_over.png")
+        self.game_over = pygame.transform.scale(self.game_over, (350, 200))
+
+    def draw_text(self, text, color, x, y):
+        text_obj = self.font.render(text, True, color)
+        text_rect = text_obj.get_rect()
+        text_rect.center = (x, y)
+        self.screen.blit(text_obj, text_rect)
+
+    def running(self):
+        while True:
+            self.screen.blit(self.background_image, (0, 0))
+
+            pygame.draw.rect(self.screen, (255, 255, 255), self.back_to_menu_button)
+            back_to_menu_button_text = self.font.render(self.back_to_menu_text, True, (0, 0, 0))
+            self.screen.blit(back_to_menu_button_text, (465, 460))
+
+            pygame.draw.rect(self.screen, (255, 255, 255), self.start_again_button)
+            start_again_text = self.font.render(self.start_again_text, True, (0, 0, 0))
+            self.screen.blit(start_again_text, (70, 460))
+
+            self.screen.blit(self.game_over, self.game_over.get_rect(topleft=(self.width // 2 - 175,
+                                                                              self.height // 2 - 100)))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = event.pos
+                    if self.start_again_button.collidepoint(mouse_pos):
+                        pass
+                        # женя вставь суда игру
+                    if self.back_to_menu_button.collidepoint(mouse_pos):
+                        stat_menu = StartMenu(self.width, self.height)
+                        stat_menu.show_menu()
+
             pygame.display.update()
 
 
