@@ -267,7 +267,6 @@ class StartGame:
                         pygame.quit()
                         sys.exit()
                     if lvl2_button.collidepoint(mouse_pos):
-                        #print("УРОВЕНЬ 2")
                         game = ButterflyGame2(800, 600)
                         game.run()
                         game.save_score()
@@ -279,11 +278,12 @@ class StartGame:
 
 
 class Final_Window:
-    def __init__(self, width, height, score, bestscore):
+    def __init__(self, width, height, score, bestscore, lvlclass):
         self.width = width
         self.height = height
         self.score = score
         self.best_score = bestscore
+        self.lvlclass = lvlclass
 
         if flag:
             self.screen = pygame.display.set_mode((self.width, self.height))
@@ -338,7 +338,7 @@ class Final_Window:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos
                     if self.start_again_button.collidepoint(mouse_pos):
-                        game = ButterflyGame(800, 600)
+                        game = self.lvlclass(800, 600)
                         game.run()
                         game.save_score()
                         pygame.quit()
@@ -412,7 +412,7 @@ class ButterflyGame:
         else:
             best_score_text = None
 
-        final_window = Final_Window(800, 600, score_text, best_score_text)
+        final_window = Final_Window(800, 600, score_text, best_score_text, ButterflyGame)
         final_window.running()
 
         pygame.display.flip()
@@ -593,7 +593,7 @@ class ButterflyGame2:
         best_score = self.load_best_score()
         best_score_text = "BEST SCORE: " + str(best_score) if best_score is not None else None
 
-        final_window = Final_Window(800, 600, score_text, best_score_text)
+        final_window = Final_Window(800, 600, score_text, best_score_text, ButterflyGame2)
         final_window.running()
 
         pygame.display.flip()
