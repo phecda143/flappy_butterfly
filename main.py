@@ -368,6 +368,12 @@ class ButterflyGame:
 
         self.butterfly_img = pygame.image.load("butterfly_icon.png")
         self.butterfly_img = pygame.transform.scale(self.butterfly_img, (50, 50))
+       #для анимации попробуем добавить еще 2 положения бабочки. add zhenya 20_01
+        self.butterfly_img_up = pygame.image.load("butterfly_up.png")
+        self.butterfly_img_up = pygame.transform.scale(self.butterfly_img_up, (50, 50))
+
+        self.butterfly_img_down = pygame.image.load("butterfly_down.png")
+        self.butterfly_img_down = pygame.transform.scale(self.butterfly_img_down, (50, 50))
 
         self.butterfly_rect = self.butterfly_img.get_rect()
         self.butterfly_rect.center = (100, self.SCREEN_HEIGHT // 2)
@@ -459,8 +465,12 @@ class ButterflyGame:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] and self.butterfly_rect.top > 0:
                 self.butterfly_rect.y -= 1
-            if keys[pygame.K_DOWN] and self.butterfly_rect.bottom < self.SCREEN_HEIGHT:
+                butterfly_img = self.butterfly_img_up
+            elif keys[pygame.K_DOWN] and self.butterfly_rect.bottom < self.SCREEN_HEIGHT:
                 self.butterfly_rect.y += 1
+                butterfly_img = self.butterfly_img_down
+            else:
+                butterfly_img = self.butterfly_img
 
             if self.paused:
                 self.show_pause_screen()
@@ -497,7 +507,7 @@ class ButterflyGame:
                 self.obstacles.clear()
                 self.show_level_message()
 
-            butterfly_contour = self.butterfly_img.copy()
+            butterfly_contour = butterfly_img.copy()
             pygame.draw.rect(butterfly_contour, self.BLACK, self.butterfly_rect, 2)
 
             self.change_colors()
@@ -530,7 +540,6 @@ class ButterflyGame:
 
         self.save_score()
         self.game_over()
-
 
 #вот вторая игра где бабочка уже между двух столбиков ура ура
 class ButterflyGame2:
