@@ -346,7 +346,7 @@ class Final_Window:
 
 
 class ButterflyGame:
-    def __init__(self, screen_width, screen_height):
+    def __init__(self, screen_width, screen_height, flag=True):
         self.SCREEN_WIDTH = screen_width
         self.SCREEN_HEIGHT = screen_height
 
@@ -380,6 +380,11 @@ class ButterflyGame:
         self.paused = False
         self.pause_button = pygame.Rect(screen_width - 100, 10, 80, 40)
 
+        # Создание файла best_score.txt, если его нет
+        if not os.path.isfile("best_score.txt"):
+            with open("best_score.txt", "w") as file:
+                file.write("0")
+
     def change_colors(self):
         if self.level <= 3 and self.total_score % self.color_change_interval == 0:
             self.background_color = random.choice(self.colors)
@@ -396,18 +401,17 @@ class ButterflyGame:
 
     def game_over(self):
         score_text = "SCORE: " + str(self.total_score)
-
         best_score = self.load_best_score()
         if best_score is not None:
             best_score_text = "BEST SCORE: " + str(best_score)
         else:
             best_score_text = None
-        gameover = Final_Window(800, 600, score_text, best_score_text)
-        gameover.running()
+
+        final_window = Final_Window(800, 600, score_text, best_score_text)
+        final_window.running()
 
         pygame.display.flip()
         pygame.time.delay(3000)
-
     def load_best_score(self):
         best_score = None
         if os.path.isfile("best_score.txt"):
@@ -501,6 +505,7 @@ class ButterflyGame:
                 if self.butterfly_rect.colliderect(obstacle):
                     self.running = False
 
+        self.save_score()
         self.game_over()
 
 
