@@ -267,7 +267,12 @@ class StartGame:
                         pygame.quit()
                         sys.exit()
                     if lvl2_button.collidepoint(mouse_pos):
-                        print("УРОВЕНЬ 2")
+                        #print("УРОВЕНЬ 2")
+                        game = ButterflyGame2(800, 600)
+                        game.run()
+                        game.save_score()
+                        pygame.quit()
+                        sys.exit()
                     if lvl3_button.collidepoint(mouse_pos):
                         print("УРОВЕНЬ 3")
             pygame.display.update()
@@ -478,6 +483,177 @@ class ButterflyGame:
                     obstacle = pygame.Rect(self.SCREEN_WIDTH, obstacle_y, 50, obstacle_height)
 
                 self.obstacles.append(obstacle)
+                self.obstacle_timer = current_time
+
+            for obstacle in self.obstacles:
+                obstacle.x -= 1
+
+                if obstacle.right < 0:
+                    self.obstacles.remove(obstacle)
+                    self.total_score += 1
+
+            if self.total_score >= self.level * 5:
+                self.level += 1
+                self.obstacles.clear()
+                self.show_level_message()
+
+            butterfly_contour = self.butterfly_img.copy()
+            pygame.draw.rect(butterfly_contour, self.BLACK, self.butterfly_rect, 2)
+
+            self.change_colors()
+
+            if self.level <= 3:
+                self.screen.fill(self.colors[self.level - 1])
+            else:
+                self.screen.fill(self.background_color)
+
+            for obstacle in self.obstacles:
+                pygame.draw.rect(self.screen, self.BLACK, obstacle, 0)
+            self.screen.blit(butterfly_contour, self.butterfly_rect)
+
+            pygame.draw.rect(self.screen, self.WHITE, self.pause_button)
+            font = pygame.font.Font(None, 36)
+            pause_text = font.render("Пауза", True, self.BLACK)
+            self.screen.blit(pause_text, (self.SCREEN_WIDTH - 90, 20))
+
+            font = pygame.font.Font(None, 36)
+            score_text = font.render("Счет: " + str(self.total_score), True, self.BLACK)
+            level_text = font.render("Уровень: " + str(self.level), True, self.BLACK)
+            self.screen.blit(score_text, (10, self.SCREEN_HEIGHT - 60))
+            self.screen.blit(level_text, (10, self.SCREEN_HEIGHT - 30))
+
+            pygame.display.flip()
+
+            for obstacle in self.obstacles:
+                if self.butterfly_rect.colliderect(obstacle):
+                    self.running = False
+
+        self.save_score()
+        self.game_over()
+
+
+#вот вторая игра где бабочка уже между двух столбиков ура ура
+class ButterflyGame2:
+    def __init__(self, screen_width, screen_height, flag=True):
+        self.SCREEN_WIDTH = screen_width
+        self.SCREEN_HEIGHT = screen_height
+
+        self.colors = [(173, 216, 230), (255, 182, 193), (128, 0, 128)]
+        self.WHITE = (255, 255, 255)
+        self.BLACK = (0, 0, 0)
+
+        if flag:
+            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        else:
+            self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            pygame.display.toggle_fullscreen()
+        pygame.display.set_caption("Игра с бабочкой 2")
+
+        self.butterfly_img = pygame.image.load("butterfly_icon.png")
+        self.butterfly_img = pygame.transform.scale(self.butterfly_img, (30, 30))
+
+        self.butterfly_rect = self.butterfly_img.get_rect()
+        self.butterfly_rect.center = (100, self.SCREEN_HEIGHT // 2)
+
+        self.obstacles = []
+        self.obstacle_timer = 0
+        self.obstacle_width = 50
+        self.min_vertical_gap = 130
+        self.butterfly_speed = 1
+
+        self.running = True
+        self.total_score = 0
+        self.level = 1
+        self.background_color = None
+        self.obstacle_color = None
+        self.color_change_interval = 5
+        self.paused = False
+        self.pause_button = pygame.Rect(screen_width - 100, 10, 80, 40)
+
+        if not os.path.isfile("best_score2.txt"):
+            with open("best_score2.txt", "w") as file:
+                file.write("0")
+
+    def change_colors(self):
+        if self.level <= 3 and self.total_score % self.color_change_interval == 0:
+            self.background_color = random.choice(self.colors)
+            self.obstacle_color = random.choice(self.colors)
+            self.color_change_interval += 5
+
+    def show_level_message(self):
+        font = pygame.font.Font(None, 72)
+        level_message = font.render("Уровень " + str(self.level), True, self.BLACK)
+        message_rect = level_message.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
+        self.screen.blit(level_message, message_rect)
+        pygame.display.flip()
+        pygame.time.delay(2000)
+
+    def game_over(self):
+        score_text = "SCORE: " + str(self.total_score)
+        best_score = self.load_best_score()
+        best_score_text = "BEST SCORE: " + str(best_score) if best_score is not None else None
+
+        final_window = Final_Window(800, 600, score_text, best_score_text)
+        final_window.running()
+
+        pygame.display.flip()
+        pygame.time.delay(3000)
+
+    def load_best_score(self):
+        best_score = None
+        if os.path.isfile("best_score2.txt"):
+            with open("best_score2.txt", "r") as file:
+                best_score = int(file.read())
+        return best_score
+
+    def save_score(self):
+        best_score = self.load_best_score()
+        if best_score is None or self.total_score > best_score:
+            with open("best_score2.txt", "w") as file:
+                file.write(str(self.total_score))
+
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.pause_button.collidepoint(event.pos):
+                    self.paused = not self.paused
+                    if self.paused:
+                        self.show_pause_screen()
+
+    def show_pause_screen(self):
+        font = pygame.font.Font(None, 72)
+        pause_text = font.render("Пауза", True, self.BLACK)
+        message_rect = pause_text.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
+        self.screen.blit(pause_text, message_rect)
+        pygame.display.flip()
+
+    def run(self):
+        pygame.init()
+
+        while self.running:
+            self.handle_events()
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_UP] and self.butterfly_rect.top > 0:
+                self.butterfly_rect.y -= self.butterfly_speed
+            if keys[pygame.K_DOWN] and self.butterfly_rect.bottom < self.SCREEN_HEIGHT:
+                self.butterfly_rect.y += self.butterfly_speed
+
+            if self.paused:
+                self.show_pause_screen()
+                pygame.time.delay(500)
+                continue
+
+            current_time = pygame.time.get_ticks()
+            if current_time - self.obstacle_timer > 2000:
+                obstacle_height_top = random.randint(50, self.SCREEN_HEIGHT - self.min_vertical_gap - 50)
+                obstacle_height_bottom = self.SCREEN_HEIGHT - obstacle_height_top - self.min_vertical_gap
+                obstacle_top = pygame.Rect(self.SCREEN_WIDTH, 0, self.obstacle_width, obstacle_height_top)
+                obstacle_bottom = pygame.Rect(self.SCREEN_WIDTH, self.SCREEN_HEIGHT - obstacle_height_bottom, self.obstacle_width, obstacle_height_bottom)
+
+                self.obstacles.extend([obstacle_top, obstacle_bottom])
                 self.obstacle_timer = current_time
 
             for obstacle in self.obstacles:
