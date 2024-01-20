@@ -412,6 +412,7 @@ class ButterflyGame:
 
         pygame.display.flip()
         pygame.time.delay(3000)
+
     def load_best_score(self):
         best_score = None
         if os.path.isfile("best_score.txt"):
@@ -425,15 +426,30 @@ class ButterflyGame:
             with open("best_score.txt", "w") as file:
                 file.write(str(self.total_score))
 
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.pause_button.collidepoint(event.pos):
+                    self.paused = not self.paused
+                    if self.paused:
+                        self.show_pause_screen()
+
+    def show_pause_screen(self):
+        font = pygame.font.Font(None, 72)
+        pause_text = font.render("Пауза", True, self.BLACK)
+        message_rect = pause_text.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
+        self.screen.blit(pause_text, message_rect)
+        pygame.display.flip()
+
     def run(self):
         pygame.init()
+        pause_countdown = None
+        pause_button_pressed = False
+
         while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    if self.pause_button.collidepoint(event.pos):
-                        self.paused = not self.paused
+            self.handle_events()
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP] and self.butterfly_rect.top > 0:
@@ -442,6 +458,8 @@ class ButterflyGame:
                 self.butterfly_rect.y += 1
 
             if self.paused:
+                self.show_pause_screen()
+                pygame.time.delay(500)
                 continue
 
             current_time = pygame.time.get_ticks()
@@ -490,7 +508,7 @@ class ButterflyGame:
 
             pygame.draw.rect(self.screen, self.WHITE, self.pause_button)
             font = pygame.font.Font(None, 36)
-            pause_text = font.render("Пауза (P)", True, self.BLACK)
+            pause_text = font.render("Пауза", True, self.BLACK)
             self.screen.blit(pause_text, (self.SCREEN_WIDTH - 90, 20))
 
             font = pygame.font.Font(None, 36)
