@@ -661,9 +661,11 @@ class ButterflyGame2:
 
                 if obstacle.right < 0:
                     self.obstacles.remove(obstacle)
-                    self.total_score += 1
+                    self.total_score += 0.5
+                    if str(self.total_score)[-1] == '0':
+                        self.total_score = int(self.total_score)
 
-            if self.total_score >= self.level * 5:
+            if self.total_score >= self.level * 10:
                 self.level += 1
                 self.obstacles.clear()
                 self.show_level_message()
